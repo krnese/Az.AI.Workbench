@@ -59,9 +59,9 @@ function Get-AzAIAgent {
     }
     else {
         # Foundry Direct — list agents via Agents API
-        $result = Send-FoundryRequest -Method GET -Path '/openai/agents'
+        $result = Send-FoundryRequest -Method GET -Path '/agents'
 
-        $agents = $result.data ?? $result
+        $agents = $result.value ?? $result.data ?? $result
         $filtered = if ($Name) {
             $agents | Where-Object { $_.name -eq $Name -or $_.id -eq $Name }
         } else { $agents }

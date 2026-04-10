@@ -34,7 +34,7 @@ function Connect-AzAIFoundry {
         [string]$ApiKey,
 
         [Parameter(ParameterSetName = 'FoundryDirect')]
-        [string]$ApiVersion = '2025-05-01-preview',
+        [string]$ApiVersion = '2025-11-15-preview',
 
         [Parameter(Mandatory, ParameterSetName = 'Workbench')]
         [string]$WorkbenchUrl
@@ -63,9 +63,17 @@ function Connect-AzAIFoundry {
         $token = $null
         if (-not $ApiKey) {
             try {
-                $tokenResponse = Get-AzAccessToken -ResourceUrl 'https://cognitiveservices.azure.com' -ErrorAction Stop
-                $token = $tokenResponse.Token
-                Write-Verbose 'Acquired Azure token for Cognitive Services'
+                $tokenResponse = Get-AzAccessToken -ResourceUrl 'https://ai.azure.com' -ErrorAction Stop
+                # Newer Az module returns SecureString; convert to plain text
+                if ($tokenResponse.Token -is [System.Security.SecureString]) {
+                    $token = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR(
+                        [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($tokenResponse.Token)
+                    )
+                }
+                else {
+                    $token = $tokenResponse.Token
+                }
+                Write-Verbose 'Acquired Azure token for AI Foundry (audience: https://ai.azure.com)'
             }
             catch {
                 throw 'No API key provided and Az token acquisition failed. Provide -ApiKey or run Connect-AzAccount first.'
