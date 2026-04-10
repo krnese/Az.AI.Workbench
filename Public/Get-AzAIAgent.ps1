@@ -42,15 +42,17 @@ function Get-AzAIAgent {
         $manifests = $result.manifests ?? $result
         if ($manifests -is [array]) {
             return $manifests | ForEach-Object {
+                $ident = $_.identity
+                $rt = $_.runtime
                 [PSCustomObject]@{
-                    PSTypeName    = 'AzAIAgent'
-                    Name          = $_.name
-                    Id            = $_.id
-                    Description   = $_.description
-                    Mode          = $_.executionMode
-                    Tools         = $_.tools
-                    Model         = $_.model
-                    ApprovalPolicy = $_.approvalPolicy
+                    PSTypeName     = 'AzAIAgent'
+                    Name           = $ident.name
+                    Id             = $ident.id
+                    Description    = ($ident.description -replace '\s+', ' ').Trim().Substring(0, [Math]::Min(80, ($ident.description -replace '\s+', ' ').Trim().Length))
+                    Mode           = $rt.executionMode
+                    ApprovalPolicy = $rt.approvalPolicy
+                    Tools          = ($_.tools | ForEach-Object { $_.name }) -join ', '
+                    Model          = $rt.defaultModel
                 }
             }
         }

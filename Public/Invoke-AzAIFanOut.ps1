@@ -78,52 +78,49 @@ function Invoke-AzAIFanOut {
 
         Write-Verbose "Fan-out: $($branchList.Count) branches (throttle: $ThrottleLimit)"
 
-        # Execute in parallel
-        $results = $branchList | ForEach-Object -ThrottleLimit $ThrottleLimit -Parallel {
-            # Import module in parallel runspace
-            $modulePath = $using:PSScriptRoot
-            Import-Module "$modulePath/../Az.AI.Workbench.psd1" -Force
+        # Capture connection for parallel runspaces
+        $connData = $script:Connection
+        $modulePath = $PSScriptRoot
 
-            # Re-establish connection in parallel runspace
-            $conn = $using:script:Connection
-            $script:Connection = $conn
+        # Execute in parallel using thread jobs for proper isolation
+        $jobs = foreach ($branch in $branchList) {
+            Start-ThreadJob -ScriptBlock {
+                param($Branch, $ConnData, $ModulePath, $MaxTok, $Temp)
 
-            $branch = $_
-            $params = @{
-                Message = $branch.Message
-            }
+                # Load module and restore connection in this runspace
+                Import-Module "$ModulePath/../Az.AI.Workbench.psd1" -Force
+                & (Get-Module Az.AI.Workbench) { $script:Connection = $args[0] } $ConnData
 
-            if ($branch.AgentName) {
-                $params.AgentName = $branch.AgentName
-            }
-            elseif ($branch.Model) {
-                $params.Model = $branch.Model
-                if ($branch.Instructions) { $params.Instructions = $branch.Instructions }
-                if ($branch.Tools) { $params.Tools = $branch.Tools }
-            }
-
-            $maxTokens = $using:MaxOutputTokens
-            $temp = $using:Temperature
-            if ($maxTokens -gt 0) { $params.MaxOutputTokens = $maxTokens }
-            if ($null -ne $temp) { $params.Temperature = $temp }
-
-            try {
-                $result = Invoke-AzAIAgent @params
-                $result | Add-Member -NotePropertyName 'BranchStatus' -NotePropertyValue 'Success'
-                $result
-            }
-            catch {
-                [PSCustomObject]@{
-                    PSTypeName     = 'AzAIAgentResponse'
-                    AgentName      = $branch.AgentName ?? $branch.Model
-                    Response       = "Error: $_"
-                    BranchStatus   = 'Failed'
-                    ConversationId = $null
-                    ToolCalls      = @()
-                    DurationMs     = 0
+                $params = @{ Message = $Branch.Message }
+                if ($Branch.AgentName) { $params.AgentName = $Branch.AgentName }
+                elseif ($Branch.Model) {
+                    $params.Model = $Branch.Model
+                    if ($Branch.Instructions) { $params.Instructions = $Branch.Instructions }
+                    if ($Branch.Tools) { $params.Tools = $Branch.Tools }
                 }
-            }
+                if ($MaxTok -gt 0) { $params.MaxOutputTokens = $MaxTok }
+
+                try {
+                    $result = Invoke-AzAIAgent @params
+                    $result | Add-Member -NotePropertyName 'BranchStatus' -NotePropertyValue 'Success' -PassThru
+                }
+                catch {
+                    [PSCustomObject]@{
+                        PSTypeName     = 'AzAIAgentResponse'
+                        AgentName      = $Branch.AgentName ?? $Branch.Model
+                        Response       = "Error: $_"
+                        BranchStatus   = 'Failed'
+                        ConversationId = $null
+                        ToolCalls      = @()
+                        DurationMs     = 0
+                    }
+                }
+            } -ArgumentList $branch, $connData, $modulePath, $MaxOutputTokens, $Temperature -ThrottleLimit $ThrottleLimit
         }
+
+        # Wait for all jobs and collect results
+        $results = $jobs | Wait-Job | Receive-Job
+        $jobs | Remove-Job -Force
 
         Write-Verbose "Fan-out complete: $($results.Count) results"
         return $results
