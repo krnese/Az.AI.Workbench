@@ -6,20 +6,16 @@ function Connect-AzAIFoundry {
     .DESCRIPTION
         Stores connection details in module scope for subsequent cmdlets.
         Supports two connection modes:
-        - Foundry Direct: provide -Endpoint and -Project (+ -ApiKey or uses Az token)
+        - Foundry Direct: provide -Endpoint and -Project (authenticates via Entra ID, or optionally -ApiKey)
         - AI Workbench: provide -WorkbenchUrl to connect via an AI Workbench instance
 
     .EXAMPLE
-        # Connect directly to Foundry
-        Connect-AzAIFoundry -Endpoint "https://ais-myproject.services.ai.azure.com" -Project "my-project" -ApiKey $key
+        # Connect directly to Foundry with Entra ID
+        Connect-AzAIFoundry -Endpoint "https://ais-myproject.services.ai.azure.com" -Project "my-project"
 
     .EXAMPLE
         # Connect via AI Workbench
-        Connect-AzAIFoundry -WorkbenchUrl "https://app-support-cxa-e2e-swc.azurewebsites.net"
-
-    .EXAMPLE
-        # Connect with Az token (no API key needed)
-        Connect-AzAIFoundry -Endpoint "https://ais-myproject.services.ai.azure.com" -Project "my-project"
+        Connect-AzAIFoundry -WorkbenchUrl "https://my-workbench.azurewebsites.net"
     #>
     [CmdletBinding(DefaultParameterSetName = 'FoundryDirect')]
     param(

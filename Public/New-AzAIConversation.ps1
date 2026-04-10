@@ -9,7 +9,7 @@ function New-AzAIConversation {
 
     .EXAMPLE
         $conv = New-AzAIConversation
-        Invoke-AzAIAgent -Conversation $conv -AgentName "MSLearn" -Message "Hello"
+        Invoke-AzAIAgent -Conversation $conv -AgentName "MyAgent" -Message "Hello"
 
     .EXAMPLE
         $conv = New-AzAIConversation -Metadata @{ source = "automation"; caseId = "SR-12345" }

@@ -10,13 +10,13 @@ function Invoke-AzAISynthesize {
 
     .EXAMPLE
         $conv = New-AzAIConversation
-        $triage = Invoke-AzAIAgent -Conversation $conv -AgentName "CaseAgent" -Message "User can't access RG"
-        $results = @("MSLearn", "MSSupport") | Invoke-AzAIFanOut -Message $triage.Response
-        $synthesis = Invoke-AzAISynthesize -Conversation $conv -AgentName "CaseAgent" -BranchResults $results
+        $triage = Invoke-AzAIAgent -Conversation $conv -AgentName "TriageAgent" -Message "User can't access RG"
+        $results = @("DocsAgent", "IncidentAgent") | Invoke-AzAIFanOut -Message $triage.Response
+        $synthesis = Invoke-AzAISynthesize -Conversation $conv -AgentName "TriageAgent" -BranchResults $results
 
     .EXAMPLE
-        # Custom synthesis prompt
-        Invoke-AzAISynthesize -Conversation $conv -AgentName "CaseAgent" -BranchResults $results `
+        # Synthesize using direct mode
+        Invoke-AzAISynthesize -Conversation $conv -Model "gpt-5-mini" -BranchResults $results `
             -Prompt "Compare findings, identify consensus, and recommend top 3 actions"
     #>
     [CmdletBinding(DefaultParameterSetName = 'AgentReference')]

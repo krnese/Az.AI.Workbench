@@ -7,7 +7,7 @@ function Get-AzAIAgent {
         Get-AzAIAgent
 
     .EXAMPLE
-        Get-AzAIAgent -Name "MSLearn"
+        Get-AzAIAgent -Name "MyAgent"
 
     .EXAMPLE
         Get-AzAIAgent | Format-Table Name, Mode, Description

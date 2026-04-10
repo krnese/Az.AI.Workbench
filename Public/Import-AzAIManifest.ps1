@@ -10,7 +10,7 @@ function Import-AzAIManifest {
 
     .EXAMPLE
         $agents = Import-AzAIManifest -Path "./manifests/"
-        $agents["MSLearn"]
+        $agents["MyAgent"]
 
     .EXAMPLE
         Import-AzAIManifest -Path "./manifests/" | Format-Table Name, Mode, Tools

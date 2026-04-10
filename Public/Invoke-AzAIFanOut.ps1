@@ -11,23 +11,22 @@ function Invoke-AzAIFanOut {
         Use Invoke-AzAISynthesize to combine the results on a shared conversation.
 
     .EXAMPLE
-        # Fan-out to 3 specialists
-        $results = @("MSLearn", "MSSupport", "CaseAgent") | Invoke-AzAIFanOut -Message "Analyze RBAC issue"
+        # Fan-out to 3 named agents
+        $results = @("DocsAgent", "IncidentAgent", "PolicyAgent") | Invoke-AzAIFanOut -Message "Analyze RBAC issue"
 
     .EXAMPLE
         # Fan-out with per-agent prompts
         $branches = @(
-            @{ AgentName = "MSLearn";    Message = "Search docs for RBAC configuration" }
-            @{ AgentName = "MSSupport";  Message = "Known issues with RBAC in last 30 days" }
-            @{ AgentName = "CaseAgent";  Message = "Similar cases for RBAC failures" }
+            @{ AgentName = "DocsAgent";     Message = "Search docs for RBAC configuration" }
+            @{ AgentName = "IncidentAgent"; Message = "Known issues with RBAC in last 30 days" }
         )
         $results = Invoke-AzAIFanOut -Branches $branches
 
     .EXAMPLE
-        # Fan-out with direct mode agents
+        # Fan-out using direct mode — no pre-configured agents needed
         $branches = @(
-            @{ Model = "gpt-5-mini"; Instructions = "Summarize briefly"; Message = "What is RBAC?" }
-            @{ Model = "gpt-5-mini"; Instructions = "Explain in detail";  Message = "What is RBAC?" }
+            @{ Model = "gpt-5-mini"; Instructions = "You are a docs expert.";     Message = "RBAC troubleshooting" }
+            @{ Model = "gpt-5-mini"; Instructions = "You are an incident analyst."; Message = "Known RBAC issues" }
         )
         $results = Invoke-AzAIFanOut -Branches $branches
     #>

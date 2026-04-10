@@ -14,17 +14,17 @@ function Invoke-AzAIAgent {
 
     .EXAMPLE
         # Agent Reference mode
-        $resp = Invoke-AzAIAgent -AgentName "MSLearn" -Message "What is Azure RBAC?"
+        $resp = Invoke-AzAIAgent -AgentName "MyAgent" -Message "What is Azure RBAC?"
 
     .EXAMPLE
-        # Direct mode
-        $resp = Invoke-AzAIAgent -Model "gpt-5-mini" -Instructions "You are a math tutor" -Message "What is 2+2?"
+        # Direct mode — specify model and instructions per-request
+        $resp = Invoke-AzAIAgent -Model "gpt-5-mini" -Instructions "You are a cloud architect" -Message "What is Azure RBAC?"
 
     .EXAMPLE
         # Shared conversation — agent switching
         $conv = New-AzAIConversation
-        $r1 = Invoke-AzAIAgent -Conversation $conv -AgentName "MSLearn" -Message "Explain RBAC"
-        $r2 = Invoke-AzAIAgent -Conversation $conv -AgentName "CaseAgent" -Message "Create a case for this"
+        $r1 = Invoke-AzAIAgent -Conversation $conv -AgentName "ResearchAgent" -Message "Explain RBAC"
+        $r2 = Invoke-AzAIAgent -Conversation $conv -Model "gpt-5-mini" -Message "Summarize the above"
 
     .EXAMPLE
         # Direct mode with MCP tools
