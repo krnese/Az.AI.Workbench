@@ -63,12 +63,47 @@ $resp.Response
 | `Connect-AzAIFoundry` | Establish connection to Foundry (Entra ID) or AI Workbench |
 | `New-AzAIConversation` | Create a new conversation |
 | `Invoke-AzAIAgent` | Invoke an agent (agent reference or direct mode) |
+| `Invoke-AzAITopology` | Execute a topology YAML with role-aware prompt injection |
 | `Invoke-AzAIFanOut` | Parallel fan-out to multiple agents on isolated conversations |
 | `Invoke-AzAISynthesize` | Synthesize branch results on a shared conversation |
 | `Get-AzAIAgent` | List available agents |
 | `Import-AzAIManifest` | Load agent definitions from local YAML manifests |
 
 ## Orchestration Patterns
+
+### Topology-as-Code (Design → Validate → Export → Automate)
+
+The flagship pattern: execute topology YAML files exported from AI Workbench. The PowerShell module applies the **same role-aware prompt injection** as the Workbench backend — agents receive position-specific instructions based on their role in the topology.
+
+```powershell
+# Execute a topology YAML — chain, panel, debate, debate-rounds, or pipeline
+$result = Invoke-AzAITopology -TopologyFile ./my-topology.yaml -Message "Analyze this issue"
+
+# Use the sample prompt embedded in the YAML
+$result = Invoke-AzAITopology -TopologyFile ./support-investigation.yaml
+
+# Access structured results
+$result.FinalAnswer       # The synthesized output
+$result.Steps             # Per-agent breakdown (agent, role, response, tokens, duration)
+$result.TotalTokens       # Total token consumption
+$result.TotalDuration     # End-to-end execution time (ms)
+```
+
+**How prompt injection works by topology:**
+
+| Topology | Agent 1 | Agent 2 | Agent 3 |
+|----------|---------|---------|---------|
+| **Chain** | Raw input | "Build on previous analysis" | "Synthesize final answer" |
+| **Panel** | Raw input (parallel) | Raw input (parallel) | "Combine strongest insights" |
+| **Debate** | Raw input (proposer) | "Critically evaluate" (challenger) | "Evaluate both sides" (judge) |
+| **Debate-Rounds** | Rebuttal prompts per round | Counter-arguments per round | Full debate judgment |
+| **Pipeline** | Routing prompt (JSON) | Input + hypothesis (specialists) | Evidence synthesis |
+
+**The workflow:**
+1. **Design** topologies in AI Workbench UI
+2. **Validate** with assessment (quality, cost, latency, safety)
+3. **Export** as YAML — version-controlled, portable
+4. **Automate** with `Invoke-AzAITopology` in CI/CD, scripts, or production
 
 ### Shared-Conversation Sequential Handoff
 

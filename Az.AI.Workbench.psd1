@@ -1,6 +1,6 @@
 @{
     RootModule        = 'Az.AI.Workbench.psm1'
-    ModuleVersion     = '1.0.0'
+    ModuleVersion     = '1.1.0'
     GUID              = 'a3f2c8e1-7b4d-4f9a-8e6c-2d1b0a5f3e7c'
     Author            = 'Kristian Nese'
     CompanyName       = 'Microsoft'
@@ -17,6 +17,7 @@
         'Invoke-AzAIAgent',
         'Invoke-AzAIFanOut',
         'Invoke-AzAISynthesize',
+        'Invoke-AzAITopology',
         'Get-AzAIAgent',
         'Import-AzAIManifest'
     )
@@ -30,7 +31,7 @@
             Tags         = @('Azure', 'AI', 'Foundry', 'Agent', 'Orchestration', 'MCP', 'LLM')
             LicenseUri   = 'https://github.com/krnese/Az.AI.Workbench/blob/main/LICENSE'
             ProjectUri   = 'https://github.com/krnese/Az.AI.Workbench'
-            ReleaseNotes = 'v1.0.0 — Connect-AzAIFoundry (Entra ID + Workbench), Invoke-AzAIAgent (agent reference + direct mode), fan-out, synthesis, agent listing. Full Azure AI Foundry Responses API support.'
+            ReleaseNotes = 'v1.1.0 — Invoke-AzAITopology: execute topology YAML files with role-aware prompt injection (chain, panel, debate, debate-rounds, pipeline). Same orchestration strategy as AI Workbench backend. Topology-as-code for CI/CD pipelines.'
         }
     }
 }
