@@ -25,6 +25,9 @@ function ConvertTo-InvokePayload {
     # Agent Reference mode
     if ($AgentName) {
         $body.agentName = $AgentName
+        if ($Instructions) {
+            $body.instructions = $Instructions
+        }
     }
 
     # Direct mode

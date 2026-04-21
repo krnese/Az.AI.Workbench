@@ -38,7 +38,6 @@ function Invoke-AzAIAgent {
         [Parameter(Mandatory, ParameterSetName = 'DirectMode')]
         [string]$Model,
 
-        [Parameter(ParameterSetName = 'DirectMode')]
         [string]$Instructions,
 
         [Parameter(ParameterSetName = 'DirectMode')]
@@ -135,6 +134,7 @@ function Invoke-AzAIAgent {
                 type = 'agent_reference'
                 name = $AgentName
             }
+            if ($Instructions) { $body.instructions = $Instructions }
         }
         else {
             $body.model = $Model
