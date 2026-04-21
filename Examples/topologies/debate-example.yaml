@@ -1,0 +1,53 @@
+# ============================================================
+# Debate Topology — Adversarial Argumentation
+# ============================================================
+# Two agents debate, a judge evaluates both sides.
+#
+# Prompt injection strategy:
+#   Proposer: receives raw user message
+#   Challenger: "Critically evaluate... identify weaknesses..."
+#   Rebuttal rounds: "Strengthen your argument..."
+#   Judge: "Evaluate the full debate... who made the stronger case?"
+#
+# Usage:
+#   Invoke-AzAITopology -TopologyFile ./debate-example.yaml
+# ============================================================
+
+schemaVersion: "1.0"
+
+metadata:
+  name: "architecture-debate"
+  description: "Two advocates debate an architectural decision, a CTO judges"
+  author: "knese@microsoft.com"
+  tags: [debate, architecture, decision-making]
+
+topology: debate-rounds
+
+debateRounds: 2
+
+agents:
+  - name: "Cloud Native Advocate"
+    role: "Proposer"
+    instructions: |
+      You advocate for cloud-native, containerized, microservices-first
+      architecture on Azure Kubernetes Service. Argue with evidence
+      and real-world tradeoffs.
+  - name: "Pragmatist"
+    role: "Challenger"
+    instructions: |
+      You advocate for pragmatic, proven approaches — modular monoliths,
+      Azure App Service, managed PaaS. Challenge over-engineering and
+      argue for simplicity and time-to-market.
+  - name: "CTO"
+    role: "Judge"
+    instructions: |
+      You are an experienced CTO. Evaluate both arguments objectively.
+      Consider cost, team capability, time-to-market, scalability,
+      and operational complexity. Give a definitive recommendation.
+
+config:
+  samplePrompt: "We're building a new order management system expecting 10,000 orders per day. Team of 6 engineers, 4-month deadline. What architecture should we use?"
+
+resolution:
+  strategy: name-match
+  fallbackModel: gpt-5

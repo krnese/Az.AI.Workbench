@@ -1,0 +1,61 @@
+# ============================================================
+# Pipeline Topology — Route → Investigate → Synthesize
+# ============================================================
+# An orchestrator routes to specialist agents, who investigate
+# in parallel, then a synthesizer combines all findings.
+#
+# Prompt injection strategy:
+#   Router: structured JSON routing prompt with agent list
+#   Specialists: user message + router's initial hypothesis
+#   Synthesizer: all evidence + "provide comprehensive synthesis"
+#
+# Usage:
+#   Invoke-AzAITopology -TopologyFile ./pipeline-example.yaml
+# ============================================================
+
+schemaVersion: "1.0"
+
+metadata:
+  name: "support-investigation"
+  description: "Route to specialists, investigate in parallel, synthesize findings"
+  author: "knese@microsoft.com"
+  tags: [pipeline, support, enterprise]
+
+topology: pipeline
+
+agents:
+  - name: "TriageAgent"
+    role: "Router / classifier"
+    instructions: |
+      You are a support intake specialist. Classify the issue,
+      determine severity, and decide which specialist agents
+      should investigate.
+  - name: "DocsSpecialist"
+    role: "Documentation expert"
+    domain: "Product documentation and known solutions"
+    instructions: |
+      You are a documentation expert. Search for relevant
+      troubleshooting guides, known issues, and best practices.
+  - name: "DiagnosticsSpecialist"
+    role: "Diagnostics expert"
+    domain: "Service health and telemetry analysis"
+    instructions: |
+      You are a diagnostics expert. Analyze the issue from a
+      platform health perspective — check for known outages,
+      service degradation, or configuration anomalies.
+  - name: "SynthesizerAgent"
+    role: "Report synthesizer"
+    instructions: |
+      You are a senior support engineer. Synthesize all specialist
+      findings into a clear, actionable investigation report with
+      root cause hypothesis, confidence level, and recommended actions.
+
+config:
+  samplePrompt: |
+    A premier customer reports intermittent connectivity loss to their
+    Azure VMs in West Europe. The issue started 48 hours ago and affects
+    3 VMs across 2 resource groups. No recent changes were made.
+
+resolution:
+  strategy: name-match
+  fallbackModel: gpt-5

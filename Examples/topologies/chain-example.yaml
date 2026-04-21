@@ -1,0 +1,47 @@
+# ============================================================
+# Chain Topology — Sequential Refinement
+# ============================================================
+# Each agent refines the previous agent's output.
+#
+# Prompt injection strategy:
+#   Agent 1: receives raw user message
+#   Agent 2: "Build on the previous analysis..."
+#   Agent 3: "Synthesize a comprehensive final answer..."
+#
+# Usage:
+#   Invoke-AzAITopology -TopologyFile ./chain-example.yaml -Message "Your question"
+# ============================================================
+
+schemaVersion: "1.0"
+
+metadata:
+  name: "sequential-refinement"
+  description: "Three agents refine output sequentially — research, analyze, synthesize"
+  author: "knese@microsoft.com"
+  tags: [chain, simple, getting-started]
+
+topology: chain
+
+agents:
+  - name: "Researcher"
+    role: "Initial research and fact gathering"
+    instructions: |
+      You are a thorough researcher. Gather relevant facts,
+      data points, and context to answer the question.
+  - name: "Analyst"
+    role: "Critical analysis and structuring"
+    instructions: |
+      You are an analytical thinker. Take the research provided
+      and identify patterns, risks, and key insights.
+  - name: "Writer"
+    role: "Final synthesis and report"
+    instructions: |
+      You are a clear technical writer. Produce a well-structured
+      final answer from the analysis provided.
+
+config:
+  samplePrompt: "What are the key architectural considerations when migrating a monolithic application to microservices on Azure?"
+
+resolution:
+  strategy: name-match
+  fallbackModel: gpt-5

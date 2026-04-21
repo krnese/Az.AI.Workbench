@@ -23,7 +23,7 @@ param(
     [string]$Model = 'gpt-5-mini'
 )
 
-Import-Module ./Az.AI.Workbench.psd1
+Import-Module "$PSScriptRoot/../Az.AI.Workbench.psd1" -Force
 
 Connect-AzAIFoundry -Endpoint $Endpoint -Project $Project
 

@@ -9,6 +9,25 @@
 # The topology YAML captures: agents, orchestration pattern,
 # role hints, and configuration — validated in the Workbench UI,
 # executed identically via PowerShell.
+#
+# Sample topologies included in Examples/topologies/:
+#   chain-example.yaml    — Sequential refinement (3 agents)
+#   panel-example.yaml    — Independent analysis + synthesis
+#   debate-example.yaml   — Adversarial debate with judge
+#   pipeline-example.yaml — Route → investigate → synthesize
+#
+# Usage:
+#   # Foundry Direct (Entra ID)
+#   ./topology-execution.ps1 -TopologyFile ./topologies/chain-example.yaml `
+#       -Endpoint "https://ais-myproject.services.ai.azure.com" -Project "my-project"
+#
+#   # Via AI Workbench
+#   ./topology-execution.ps1 -TopologyFile ./topologies/debate-example.yaml `
+#       -WorkbenchUrl "https://my-workbench.azurewebsites.net"
+#
+#   # With a custom message (overrides samplePrompt in YAML)
+#   ./topology-execution.ps1 -TopologyFile ./topologies/pipeline-example.yaml `
+#       -Endpoint "..." -Project "..." -Message "Customer cannot access Key Vault"
 # ============================================================
 
 param(

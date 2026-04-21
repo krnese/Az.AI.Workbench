@@ -4,7 +4,7 @@ Application-layer multi-agent orchestration for Azure AI Foundry — from PowerS
 
 ## What it does
 
-This module provides cmdlets for invoking AI agents via the Azure AI Foundry Responses API. It supports agent switching on shared conversations, parallel fan-out to specialists, and result synthesis — the orchestration patterns validated in the Microsoft AI Workbench.
+This module provides cmdlets for invoking AI agents via the Azure AI Foundry Responses API. It supports agent switching on shared conversations, parallel fan-out to specialists, result synthesis, and **topology-as-code execution** — the orchestration patterns validated in the Microsoft AI Workbench.
 
 **Two connection modes:**
 - **Foundry Direct** — talk directly to the Responses API using Entra ID (your Azure identity)
@@ -13,6 +13,8 @@ This module provides cmdlets for invoking AI agents via the Azure AI Foundry Res
 **Two execution modes:**
 - **Agent Reference** (`-AgentName`) — invoke a named agent deployed in your Foundry project
 - **Direct Mode** (`-Model`) — specify the model deployment, instructions, and tools per-request (no pre-configured agent needed)
+
+Both modes support `-Instructions` to pass additional context (e.g., topology role hints) alongside the agent's own configuration.
 
 ## Installation
 
@@ -193,7 +195,36 @@ The token audience is `https://ai.azure.com`. No API keys are required.
 - PowerShell 7.0+
 - Azure AI Foundry project with a `.services.ai.azure.com` endpoint
 - `Az.Accounts` module for Entra ID authentication (`Install-Module Az.Accounts`)
+- `powershell-yaml` module for topology execution (`Install-Module powershell-yaml`)
 - Optional: AI Workbench instance for `/api/invoke` routing
+
+## Sample Topologies
+
+The `Examples/topologies/` directory includes ready-to-run YAML files for every supported pattern:
+
+| File | Topology | Agents | Description |
+|------|----------|--------|-------------|
+| `chain-example.yaml` | Chain | 3 | Sequential refinement: research → analyze → synthesize |
+| `panel-example.yaml` | Panel | 4 | Independent analysis (parallel) + synthesis |
+| `debate-example.yaml` | Debate-Rounds | 3 | Adversarial debate with 2 rounds + judge |
+| `pipeline-example.yaml` | Pipeline | 4 | Route → parallel specialists → synthesize |
+
+```powershell
+# Try it — uses direct mode with fallback model (no pre-configured agents needed)
+Connect-AzAIFoundry -Endpoint "https://..." -Project "my-project"
+Invoke-AzAITopology -TopologyFile ./Examples/topologies/debate-example.yaml
+```
+
+Each YAML includes a `config.samplePrompt` so you can run it immediately without composing a message.
+
+## Examples
+
+| Script | Pattern |
+|--------|---------|
+| `Examples/basic-chat.ps1` | Multi-turn conversation (agent ref + direct mode) |
+| `Examples/agent-switching.ps1` | Sequential handoff between agents on shared conversation |
+| `Examples/fan-out-synthesize.ps1` | Parallel fan-out + synthesis |
+| `Examples/topology-execution.ps1` | Topology-as-code from YAML files |
 
 ## License
 

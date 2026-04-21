@@ -1,0 +1,56 @@
+# ============================================================
+# Panel Topology — Independent Analysis + Synthesis
+# ============================================================
+# Multiple agents analyze the same question independently
+# (in parallel), then a synthesizer combines the best insights.
+#
+# Prompt injection strategy:
+#   Panelists: each receives raw user message (parallel)
+#   Synthesizer: "Combine the strongest insights from each..."
+#
+# Usage:
+#   Invoke-AzAITopology -TopologyFile ./panel-example.yaml
+# ============================================================
+
+schemaVersion: "1.0"
+
+metadata:
+  name: "multi-perspective-analysis"
+  description: "Three experts analyze independently, then insights are combined"
+  author: "knese@microsoft.com"
+  tags: [panel, brainstorming, diverse-perspectives]
+
+topology: panel
+
+agents:
+  - name: "SecurityExpert"
+    role: "Security and compliance perspective"
+    instructions: |
+      You are an Azure security expert. Analyze from a security,
+      compliance, and zero-trust perspective. Focus on risks,
+      attack surface, and regulatory requirements.
+  - name: "CostAnalyst"
+    role: "Cost and efficiency perspective"
+    instructions: |
+      You are a FinOps specialist. Analyze from a cost efficiency
+      perspective. Consider reserved instances, right-sizing,
+      and total cost of ownership.
+  - name: "ReliabilityEngineer"
+    role: "Reliability and operations perspective"
+    instructions: |
+      You are a site reliability engineer. Analyze from an
+      availability, disaster recovery, and operational excellence
+      perspective. Consider SLAs and blast radius.
+  - name: "ChiefArchitect"
+    role: "Synthesizer — combines all perspectives"
+    instructions: |
+      You are a chief architect. Synthesize the security, cost,
+      and reliability perspectives into a balanced recommendation
+      with clear tradeoffs.
+
+config:
+  samplePrompt: "We need to design the Azure landing zone for a regulated financial services company with 500 VMs, strict data residency requirements, and 99.99% SLA targets."
+
+resolution:
+  strategy: name-match
+  fallbackModel: gpt-5
