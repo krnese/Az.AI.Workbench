@@ -66,6 +66,7 @@ $resp.Response
 | `New-AzAIConversation` | Create a new conversation |
 | `Invoke-AzAIAgent` | Invoke an agent (agent reference or direct mode) |
 | `Invoke-AzAITopology` | Execute a topology YAML with role-aware prompt injection |
+| `Export-AzAITopology` | Export/download topology YAML from a connected Workbench instance |
 | `Invoke-AzAIFanOut` | Parallel fan-out to multiple agents on isolated conversations |
 | `Invoke-AzAISynthesize` | Synthesize branch results on a shared conversation |
 | `Get-AzAIAgent` | List available agents |
@@ -104,8 +105,17 @@ $result.TotalDuration     # End-to-end execution time (ms)
 **The workflow:**
 1. **Design** topologies in AI Workbench UI
 2. **Validate** with assessment (quality, cost, latency, safety)
-3. **Export** as YAML — version-controlled, portable
+3. **Export** as YAML — version-controlled, portable (includes assessment scores when available)
 4. **Automate** with `Invoke-AzAITopology` in CI/CD, scripts, or production
+
+```powershell
+# Pull topology YAML from a running Workbench instance (includes assessment scores)
+Export-AzAITopology -Name "support-triage" -Agents @("Classifier","Resolver","Reviewer") `
+    -Topology "chain" -OutputPath "./topologies/triage.yaml"
+
+# Then execute it
+Invoke-AzAITopology -TopologyFile "./topologies/triage.yaml" -Message "Customer issue..."
+```
 
 ### Shared-Conversation Sequential Handoff
 

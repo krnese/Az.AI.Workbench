@@ -18,6 +18,7 @@
         'Invoke-AzAIFanOut',
         'Invoke-AzAISynthesize',
         'Invoke-AzAITopology',
+        'Export-AzAITopology',
         'Get-AzAIAgent',
         'Import-AzAIManifest'
     )
